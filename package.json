@@ -1,0 +1,20 @@
+{
+    "name": "hamster-youtrack-importer",
+    "version": "1.0.0",
+    "description": "Hamster Time tracking TSV export to youtrack importer.",
+    "main": "src/app.ts",
+    "author": "Sven Schoradt",
+    "license": "MIT",
+    "dependencies": {
+        "@types/node": "^22.7.4",
+        "typescript": "^5.6.2"
+    },
+    "devDependencies": {
+        "ts-node": "^10.9.2"
+    },
+    "scripts": {
+        "build": "tsc",
+        "start": "node ./bin/app.js",
+        "dev": "ts-node ./src/app.ts"
+    }
+}

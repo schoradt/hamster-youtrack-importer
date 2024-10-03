@@ -11,8 +11,8 @@ interface Config {
 
 const config: Config = {
     youtrack: {
-        host: process.env.YT_HOST || '',
-        token: process.env.YT_TOKEN || ''
+        host: process.env.YT_HOST ?? '',
+        token: process.env.YT_TOKEN ?? ''
     }
 }
 

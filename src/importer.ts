@@ -41,12 +41,16 @@ export class Importer {
         }
     
         for (const api of this.apis) {
-            const issue = await api.issues.byId(work.issue);
+            try {
+                const issue = await api.issues.byId(work.issue);
 
-            if (issue) {
-                this.importWorkIntoIssue(api, work, issue);
-
-                return;
+                if (issue) {
+                    this.importWorkIntoIssue(api, work, issue);
+    
+                    return;
+                }
+            } catch (e) {
+                // ignore
             }
         }
 
@@ -89,24 +93,34 @@ export class Importer {
                 return;
             }
 
-            api.workItems.all(issue.id)
-                .then((workItems: WorkItem[]) => {
-                    for (const workItem of workItems) {
-                        if (this.workItemsEqualsWork(workItem, work)) {
-                            resolve(true);
+            const that = this;
 
+            const searchWorkItem = function (api: Youtrack, work: Work, id: string, skip: number) {
+                api.workItems.all(id, { $skip: skip })
+                .then((workItems: WorkItem[]) => {
+                    if (workItems.length == 0) {
+                        resolve(false);
+                    }
+    
+                    for (const workItem of workItems) {
+                        if (that.workItemsEqualsWork(workItem, work)) {
+                            resolve(true);
+    
                             return;
                         }
-
+    
                     }
-
-                    resolve(false);
+    
+                    searchWorkItem(api, work, id, skip + workItems.length);
                 })
                 .catch((error) => {
                     console.error("can't fetch work for issue " + issue.id + ": " + error)
 
                     resolve(false);
                 });
+            }
+
+            searchWorkItem(api, work, issue.id, 0);
         });
     }
 

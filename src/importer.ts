@@ -74,13 +74,13 @@ export class Importer {
                         minutes: work.minutes
                     },
                     date: work.end.valueOf(),
-                    text: work.description
+                    text: (work.description ?? work.category)
                 }).then(workItem => {
-                    console.log("work '" + work.description + "' with " + work.minutes + " minutes was assigned to " + issue.id);
+                    console.log("work '" + (work.description ?? work.category) + "' with " + work.minutes + " minutes was assigned to " + issue.id);
                 })
                 .catch((error) => console.error("can't import work intro issue " + issue.id + ": " + error));
             } else {
-                console.log("work " + work.end.format('L') + " '" + work.description + "' with " + work.minutes + " minutes was already assigned to " + issue.id);
+                console.log("work " + work.end.format('L') + " '" + (work.description ?? work.category) + "' with " + work.minutes + " minutes was already assigned to " + issue.id);
             }
         });
     }
@@ -126,7 +126,7 @@ export class Importer {
 
     private workItemsEqualsWork(workItem: WorkItem, work: Work) {
         return workItem.duration?.minutes == work.minutes 
-            && workItem.text == work.description
+            && workItem.text == (work.description ?? work.category)
             && moment(workItem.date).isSame(work.end, 'day');
     }
 }

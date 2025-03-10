@@ -74,13 +74,13 @@ export class Importer {
                         minutes: work.minutes
                     },
                     date: work.end.valueOf(),
-                    text: (work.description ?? work.category)
+                    text: this.getItemDescription(work.description, work.category)
                 }).then(workItem => {
-                    console.log("work '" + (work.description ?? work.category) + "' with " + work.minutes + " minutes was assigned to " + issue.id);
+                    console.log("work " + work.end.format('L') + " '" + this.getItemDescription(work.description, work.category) + "' with " + work.minutes + " minutes was assigned to " + issue.id + " ("+work.issue+")");
                 })
-                .catch((error) => console.error("can't import work intro issue " + issue.id + ": " + error));
+                .catch((error) => console.error("can't import work " + work.end.format('L') + " intro issue " + issue.id + " ("+work.issue+")" + ": " + error));
             } else {
-                console.log("work " + work.end.format('L') + " '" + (work.description ?? work.category) + "' with " + work.minutes + " minutes was already assigned to " + issue.id);
+                console.log("work " + work.end.format('L') + " '" + this.getItemDescription(work.description, work.category) + "' with " + work.minutes + " minutes was already assigned to " + issue.id + " ("+work.issue+")");
             }
         });
     }
@@ -103,7 +103,7 @@ export class Importer {
                     }
     
                     for (const workItem of workItems) {
-                        if (that.workItemsEqualsWork(workItem, work)) {
+                        if (that.workItemsEqualsWork(workItem, work, )) {
                             resolve(true);
     
                             return;
@@ -126,8 +126,21 @@ export class Importer {
 
     private workItemsEqualsWork(workItem: WorkItem, work: Work) {
         return workItem.duration?.minutes == work.minutes 
-            && workItem.text == (work.description ?? work.category)
-            && moment(workItem.date).isSame(work.end, 'day');
+            && workItem.text == this.getItemDescription(work.description, work.category)
+            && moment(workItem.date).isSame(work.end, 'day')
+            && workItem.author?.login.includes("schoradt");
+    }
+
+    private getItemDescription(description: string, category: string): string {
+        if (description && /^\s*$/.test(description)) {
+            return description;
+        }
+
+        if (category && /^\s*$/.test(category)) {
+            return category;
+        }
+
+        return "";
     }
 }
 
